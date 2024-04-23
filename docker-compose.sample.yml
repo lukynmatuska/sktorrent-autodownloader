@@ -1,4 +1,3 @@
-version: "3"
 services:
   api:
     image: ghcr.io/lukynmatuska/sktorrent-autodownloader:latest
@@ -12,6 +11,12 @@ services:
     ports:
       - "8000:80"
     environment:
-      CORS_ORIGINS: '["https://vvcb.cz", "http://localhost:4200"]'
+      - CORS_ORIGINS
+      - SKTORRENT_USERNAME
+      - SKTORRENT_PASSWORD
+      - QBT_URL
+      - QBT_LOGIN
+      - QBT_PASSWORD
+      - TZ
     stdin_open: true  # -i
     tty: true         # -t

@@ -4,19 +4,22 @@ ARG USER_ID=1000
 ARG GROUP_ID=1000
 RUN echo "Used user id: ${USER_ID}\nUsed group id: ${GROUP_ID}"
 
-# Update system
-RUN apt update && apt upgrade -y && apt autoremove -y
+# Update system and install packages
+RUN apt update &&\
+    apt upgrade -y &&\
+    apt autoremove -y &&\
+    apt install -y git
 
 # Upgrade python package manager
-RUN pip install --upgrade pip
+RUN pip install pdm
 
 # Change working directory
 WORKDIR /var/www
 
 # Copy folders and files – It's important to copy files before changing their ownership
 COPY ./.git ./.git
-COPY ./app ./app
-COPY ./requirements.txt ./requirements.txt
+COPY ./pyproject.toml ./pyproject.toml
+COPY ./src ./src
 
 # Change ID of www-data user and group to ID from ENV
 RUN if [ ${USER_ID:-0} -ne 0 ] && [ ${GROUP_ID:-0} -ne 0 ]; then \
@@ -31,8 +34,8 @@ RUN if [ ${USER_ID:-0} -ne 0 ] && [ ${GROUP_ID:-0} -ne 0 ]; then \
 # Change user
 USER www-data:www-data
 
-# Install requirements
-RUN pip install --no-cache-dir --upgrade -r ./requirements.txt
+# Install dependencies
+RUN pdm install
 
 # Expose port
 EXPOSE 80
@@ -43,4 +46,4 @@ HEALTHCHECK --interval=10s --timeout=10s --retries=3 \
 
 # Command on start of container
 # If running behind a proxy like Nginx or Traefik add --proxy-headers
-CMD ["uvicorn", "src.main:app", "--proxy-headers", "--forwarded-allow-ips", "*", "--host", "0.0.0.0", "--port", "80"]
+CMD bash -c "eval \$(python3 -m pdm venv activate in-project) && uvicorn --proxy-headers --forwarded-allow-ips \"*\" --host 0.0.0.0 --port 80 src.main:app"
