@@ -81,4 +81,7 @@ def skt_page(
                     detail=f"500 {res}"
                 )
             return "200"
-    return "404"
+    return HTTPException(
+        status_code=404,
+        detail="Link not found."
+    )
