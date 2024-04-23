@@ -6,7 +6,7 @@ authors = [
     {name = "Lukas Matuska", email = "matuska.lukas@lukasmatuska.cz"},
 ]
 dependencies = [
-    "requests>=2.31.0",
+    "requests[socks]>=2.31.0",
     "bs4>=0.0.2",
     "gitpython>=3.1.43",
     "uvicorn>=0.29.0",

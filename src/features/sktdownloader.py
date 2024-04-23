@@ -1,5 +1,6 @@
 """Module for download torrents from SkTorrent"""
 
+import json
 import os
 import requests
 from dotenv import load_dotenv
@@ -24,6 +25,11 @@ class SkTorrentDownloader:
         self.username = username
         self.password = password
         self.request_session = requests.Session()
+
+        # Setup proxies for our session
+        proxies = os.getenv("REQUESTS_PROXIES", "")
+        if proxies != "":
+            self.request_session.proxies = json.loads(proxies)
 
     def login(self):
         """Function to login into portal"""
