@@ -1,0 +1,28 @@
+[project]
+name = "sktorrent-autodownloader"
+version = "0.1.0"
+description = "Software for easily download torrent files from SkTorrent."
+authors = [
+    {name = "Lukas Matuska", email = "matuska.lukas@lukasmatuska.cz"},
+]
+dependencies = [
+    "requests>=2.31.0",
+    "bs4>=0.0.2",
+    "gitpython>=3.1.43",
+    "uvicorn>=0.29.0",
+    "pydantic>=2.7.0",
+    "fastapi>=0.110.2",
+    "python-dotenv>=1.0.1",
+    "python-qbittorrent>=0.4.3",
+]
+requires-python = ">=3.10.0"
+readme = "README.md"
+license = {text = "None"}
+
+[tool.pdm]
+distribution = false
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pylint[spelling]>=3.1.0",
+]
