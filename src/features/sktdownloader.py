@@ -10,7 +10,7 @@ SKTORRENT_URL = "https://sktorrent.eu"
 REQUEST_TIMEOUT = 5
 DOWNLOAD_IN_SLOVAK = "STIAHNUT"
 # pylint: disable=line-too-long
-TMP_URL = "https://sktorrent.eu/torrent/details.php?name=Survivor-%C4%8Cesko-&-Slovensko-S03E16-2024-WEB-DL-1080p-CSFD-24%&id=c55d277938775ef755ca8697d9001115fbe5b4c2"
+SKTORRENT_DEFAULT_PAGE_URL = "https://sktorrent.eu/torrent/details.php?name=Survivor-%C4%8Cesko-&-Slovensko-S03E16-2024-WEB-DL-1080p-CSFD-24%&id=c55d277938775ef755ca8697d9001115fbe5b4c2"
 
 
 class SkTorrentDownloader:
@@ -42,16 +42,15 @@ class SkTorrentDownloader:
         """Function to return GET request with session"""
         return self.request_session.get(*args, **kwargs)
 
-    # def download_torrent(self):
-    #     """Function to download the torrent file"""
-    #     pass
+    def download_torrent(self, torrent_url):
+        """Function to download the torrent file"""
+        torrent_request = self.request_session.get(torrent_url)
+        return torrent_request.content
 
-    def get_torrent_links_from_page(self, page_url: str = TMP_URL):
+    def get_torrent_links_from_page(self, page_url: str = SKTORRENT_DEFAULT_PAGE_URL):
         """Function to parse """
         torrent_page = self.get_page(page_url)
         soup = BeautifulSoup(torrent_page.text, "html.parser")
-        # print(soup)
-        # return soup.select_one('body > center > table:nth-child(2) > tbody > tr:nth-child(1) > td > table > tbody > tr > td > div > table:nth-child(3) > tbody > tr:nth-child(2) > td:nth-child(5) > a')
         return soup.find_all(
             "a",
             string = DOWNLOAD_IN_SLOVAK
