@@ -17,11 +17,11 @@ jobs:
         platform:
           - linux/amd64
           - linux/arm/v8
-        steps:
-          - name: Checkout repository
-            uses: actions/checkout@master
-          - name: Build the Docker image
-            run: docker build --file Dockerfile --tag ${{ github.repository}}:$(git rev-parse --abbrev-ref HEAD | sed 's/[^a-zA-Z0-9]/-/g') .
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+      - name: Build the Docker image
+        run: docker build --file Dockerfile --tag ${{ github.repository}}:$(git rev-parse --abbrev-ref HEAD | sed 's/[^a-zA-Z0-9]/-/g') .
   publish-image:
     runs-on: ubuntu-latest
     permissions:
