@@ -13,7 +13,8 @@
 				"eamodio.gitlens",
 				"redhat.vscode-yaml",
 				"ms-python.pylint",
-				"tamasfe.even-better-toml"
+				"tamasfe.even-better-toml",
+				"GitHub.vscode-github-actions"
 			]
 		}
 	}
