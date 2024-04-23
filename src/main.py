@@ -18,7 +18,7 @@ app = FastAPI(
         "persistAuthorization": True,
         "tryItOutEnabled": True,
     },
-    title="SkTorent",
+    title="SkTorent Autodownloader",
     description="REST API for easy torrent downloading",
 )
 
