@@ -4,11 +4,11 @@ import os
 import json
 from datetime import datetime
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from qbittorrent import Client
 from .features.git import Git
-from .features.sktdownloader import SkTorrentDownloader, SKTORRENT_URL
+from .features.sktdownloader import SkTorrentDownloader, SKTORRENT_URL, SKTORRENT_DEFAULT_PAGE_URL
 
 
 load_dotenv()  # take environment variables from .env.
@@ -51,7 +51,10 @@ def health_check():
 
 
 @app.get("/skt/page/")
-def skt_page():
+def skt_page(
+    page:str = SKTORRENT_DEFAULT_PAGE_URL,
+    episode:str = "S03E16",
+):
     """Function to download the torrent"""
 
     # Login to qBittorent
@@ -66,16 +69,16 @@ def skt_page():
     skt.login()
 
     # Begin process
-    links = skt.get_torrent_links_from_page()
+    links = skt.get_torrent_links_from_page(page)
     for link in links:
-        if "S03E16" in link["href"]:
+        if episode in link["href"]:
             torrent_url = SKTORRENT_URL + link["href"]
-            torrent_request = skt.request_session.get(torrent_url)
-            print(torrent_request)
-            torrent_file = torrent_request.content
-            with open('my-torrent-file.torrent', 'wb') as tf:
-                tf.write(torrent_file)
-            with open('my-torrent-file.torrent', 'rb') as tf:
-                print(qb.download_from_file(tf))
+            torrent_file = skt.download_torrent(torrent_url)
+            res = qb.download_from_file(torrent_file)
+            if res == "Fails.":
+                return HTTPException(
+                    status_code=500,
+                    detail=f"500 {res}"
+                )
             return "200"
     return "404"
