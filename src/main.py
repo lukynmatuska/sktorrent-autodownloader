@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from qbittorrent import Client
 from .features.git import Git
-from .features.sktdownloader import SkTorrentDownloader, SKTORRENT_URL, SKTORRENT_DEFAULT_PAGE_URL
+from .features.sktdownloader import SkTorrentDownloader, SKTORRENT_DEFAULT_PAGE_URL
 
 
 load_dotenv()  # take environment variables from .env.
@@ -69,19 +69,47 @@ def skt_page(
     skt.login()
 
     # Begin process
-    links = skt.get_torrent_links_from_page(page)
-    for link in links:
-        if episode in link["href"]:
-            torrent_url = SKTORRENT_URL + link["href"]
-            torrent_file = skt.download_torrent(torrent_url)
-            res = qb.download_from_file(torrent_file)
-            if res == "Fails.":
-                return HTTPException(
-                    status_code=500,
-                    detail=f"500 {res}"
-                )
-            return "200"
-    return HTTPException(
-        status_code=404,
-        detail="Link not found."
+    torrent_url = skt.get_episode_link(episode, page)
+    if torrent_url is None:
+        return HTTPException(
+            status_code=404,
+            detail="Link not found."
+        )
+    torrent_file = skt.download_torrent(torrent_url)
+    res = qb.download_from_file(torrent_file)
+    if res == "Fails.":
+        return HTTPException(
+            status_code=500,
+            detail=f"500 {res}"
+        )
+    return "200"
+
+@app.get("/skt/page/loop")
+def skt_page_loop(
+    page:str = SKTORRENT_DEFAULT_PAGE_URL,
+    episode:str = "S03E18",
+    verbose:bool = False
+):
+    """Function to download the torrent with loop"""
+
+    # Login to qBittorent
+    qb = Client(os.getenv("QBT_URL", "localhost"))
+    qb.login(
+        os.getenv("QBT_LOGIN"), # username
+        os.getenv("QBT_PASSWORD"), # password
     )
+
+    # Init SkTorrent
+    skt = SkTorrentDownloader()
+    skt.login()
+
+    # Begin process
+    torrent_url = skt.get_episode_link_loop(episode, page, verbose=verbose)
+    torrent_file = skt.download_torrent(torrent_url)
+    res = qb.download_from_file(torrent_file)
+    if res == "Fails.":
+        return HTTPException(
+            status_code=500,
+            detail=f"500 {res}"
+        )
+    return "200"
