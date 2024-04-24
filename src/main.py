@@ -87,8 +87,7 @@ def skt_page(
 @app.get("/skt/page/loop")
 def skt_page_loop(
     page:str = SKTORRENT_DEFAULT_PAGE_URL,
-    episode:str = "S03E18",
-    verbose:bool = False
+    episode:str = "S03E18"
 ):
     """Function to download the torrent with loop"""
 
@@ -104,7 +103,7 @@ def skt_page_loop(
     skt.login()
 
     # Begin process
-    torrent_url = skt.get_episode_link_loop(episode, page, verbose=verbose)
+    torrent_url = skt.get_episode_link_loop(episode, page)
     torrent_file = skt.download_torrent(torrent_url)
     res = qb.download_from_file(torrent_file)
     if res == "Fails.":

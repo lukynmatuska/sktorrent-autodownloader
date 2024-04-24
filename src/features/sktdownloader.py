@@ -3,6 +3,7 @@
 import json
 import os
 import time
+import logging
 import requests
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
@@ -24,6 +25,8 @@ class SkTorrentDownloader:
         username=os.getenv("SKTORRENT_USERNAME"),
         password=os.getenv("SKTORRENT_PASSWORD")
     ) -> None:
+        self.logger = logging.Logger(__name__, logging.INFO)
+        self.logger.info("Creating object of %s", self.__class__.__name__)
         self.username = username
         self.password = password
         self.request_session = requests.Session()
@@ -80,20 +83,16 @@ class SkTorrentDownloader:
         self,
         episode: str = "S03E18",
         page_url: str = SKTORRENT_DEFAULT_PAGE_URL,
-        sleep_time: int = ONE_MINUTE,
-        verbose: bool = False
+        sleep_time: int = ONE_MINUTE
     ) -> str:
         """Function to get link to episode torrent file in loop"""
         while True:
-            if verbose:
-                print(f"Going to get link for episode '{episode}'.")
+            self.logger.info("Going to get link for episode '%s'.", episode)
             episode_link = self.get_episode_link(episode, page_url)
             if episode_link is not None:
-                if verbose:
-                    print(f"Found link for episode '{episode}'.")
+                self.logger.info("Found link for episode '%s'.", episode)
                 return episode_link
-            elif verbose:
-                print(f"Not found link for episode '{episode}', going to wait for {sleep_time} seconds.")
+            self.logger.info("Not found link for episode '%s', going to wait for %s seconds.", episode, sleep_time)
             time.sleep(sleep_time)
 
 if __name__ == "__main__":
