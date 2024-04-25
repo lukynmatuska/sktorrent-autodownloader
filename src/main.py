@@ -54,6 +54,7 @@ def health_check():
 def skt_page(
     page:str = SKTORRENT_DEFAULT_PAGE_URL,
     episode:str = "S03E16",
+    category:str = "Survivor"
 ):
     """Function to download the torrent"""
 
@@ -76,7 +77,10 @@ def skt_page(
             detail="Link not found."
         )
     torrent_file = skt.download_torrent(torrent_url)
-    res = qb.download_from_file(torrent_file)
+    res = qb.download_from_file(
+        file_buffer=torrent_file,
+        category=category
+    )
     if res == "Fails.":
         return HTTPException(
             status_code=500,
@@ -88,7 +92,8 @@ def skt_page(
 def skt_page_loop(
     page:str = SKTORRENT_DEFAULT_PAGE_URL,
     episode:str = "S03E18",
-    verbose:bool = False
+    verbose:bool = False,
+    category:str = "Survivor"
 ):
     """Function to download the torrent with loop"""
 
@@ -106,7 +111,10 @@ def skt_page_loop(
     # Begin process
     torrent_url = skt.get_episode_link_loop(episode, page, verbose=verbose)
     torrent_file = skt.download_torrent(torrent_url)
-    res = qb.download_from_file(torrent_file)
+    res = qb.download_from_file(
+        file_buffer=torrent_file,
+        category=category
+    )
     if res == "Fails.":
         return HTTPException(
             status_code=500,
